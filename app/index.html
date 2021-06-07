@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>Node JS App</title>
+    <script>
+      var host = "http://localhost:3000";
+      var data = {};
+      var userid;
+      callAPI('get-profile','GET');
+
+      function saveData() {
+        //document.getElementById('list').style = "block";
+        var name = document.getElementById('name').value;
+        var address = document.getElementById('address').value;
+        data.name=name;
+        data.address=address;
+        data.userid = userid;
+        callAPI('update-profile','POST');
+      }
+
+      function callAPI(endpoint, method) {
+        var url = host+'/'+endpoint;
+        var xhttp = new XMLHttpRequest();
+        xhttp.open(method, url, true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 3 && this.status == 200) {
+           var d = JSON.parse(this.responseText);
+           document.getElementById('name').value = d.name;
+           document.getElementById('address').value = d.address;
+           userid = d.userid;
+          }
+        };
+
+        if(method == "POST") {
+          var params = typeof data == 'string' ? data : Object.keys(data).map(
+             function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+          ).join('&');
+          xhttp.send(params);
+        } else {
+          xhttp.send();
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Hello Node World!</h1>
+    Name: <input type="text" id="name" id="name" />
+    Address <input type="text" id="address" id="address" />
+    <button id="save" id="save" onclick="saveData()">Save</button>
+
+    <div id="list" sstyle="display: none">
+      <h2>List:</h2>
+      <div id="dvName"></div>
+      <div id="dvAddress"></div>
+    </div>
+  </body>
+</html>
